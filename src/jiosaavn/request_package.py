@@ -6,6 +6,8 @@ from bs4 import BeautifulSoup
 import random, time
 import urllib3
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+from pathlib import Path
+from jiosaavn.debugger import ic
 
 #<!----- Default Declarations ----->
 DEFAULT_TIMEOUT_s = 5 #seconds
@@ -26,12 +28,20 @@ class TimeoutHTTPAdapter(HTTPAdapter):
             kwargs["timeout"] = self.timeout
         return super().send(request, **kwargs)
 
-class req:
+class Req:
     def __init__(self,MIN_TIME_BET_REQ_s:float = 1):
         self.MIN_TIME_BET_REQ_s = MIN_TIME_BET_REQ_s #seconds
         self.DEFAULT_TIMEOUT_s = DEFAULT_TIMEOUT_s  #seconds
         self.last_request = time.time()
-        self.headers = self.default_headers(self._get_new_useragent())
+        self.headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:49.0) Gecko/20100101 Firefox/49.0',
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+            'Accept-Language': 'en-US,en;q=0.5',
+            'Accept-Encoding': 'gzip, deflate',
+            'DNT': '1',
+            'Connection': 'keep-alive',
+            'Upgrade-Insecure-Requests': '1'
+        }
 
     @staticmethod
     def useragent_list()-> list:
@@ -42,18 +52,15 @@ class req:
         'Mozilla/5.0 (Linux; Android 11; SM-G960U) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.72 Mobile Safari/537.36',
         'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101 Firefox/102.0'] 
 
-    @staticmethod
-    def default_headers(useragent: str) -> dict:
-        return {'User-Agent': useragent,
-        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
-        'Accept-Language': 'en-CA,en-US;q=0.7,en;q=0.3',
-        'Connection': 'keep-alive',
-        'Referer': 'https://www.google.com/',
-        'Upgrade-Insecure-Requests': '1',
-        'Sec-Fetch-Dest': 'document',
-        'Sec-Fetch-Mode': 'navigate',
-        'Sec-Fetch-Site': 'none',
-        'Sec-Fetch-User': '?1'
+    def default_headers(self) -> dict:
+        return {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:49.0) Gecko/20100101 Firefox/49.0',
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+            'Accept-Language': 'en-US,en;q=0.5',
+            'Accept-Encoding': 'gzip, deflate',
+            'DNT': '1',
+            'Connection': 'keep-alive',
+            'Upgrade-Insecure-Requests': '1'
         }
 
     @staticmethod
@@ -105,16 +112,14 @@ class req:
 
         Returns:
             request object: request object
-        """        
+        """
+                
         if randomize_referer:
             self._change_referer()
         if randomize_useragent:
             self._change_useragent()
 
-        if custom_headers:
-            headers = custom_headers
-        else:
-            headers = self.headers
+        headers = custom_headers if custom_headers else self.headers
         
         if not timeout:
             timeout = self.DEFAULT_TIMEOUT_s
@@ -192,12 +197,26 @@ class req:
         
         return class_def + header_def
 
+    def download(self, url: str, save_to_file: bool = True) -> Path:
+        filepath = Path(url.split('/')[-1])
+        ic(f"Downloading from {url} to {filepath}")
+        start = time.time()
+        with requests.get(url, stream=True, headers=self.headers) as r:
+            r.raise_for_status()
+            with open(filepath, 'wb') as f:
+                for chunk in r.iter_content(chunk_size=8192): 
+                    f.write(chunk)
+        size = filepath.stat().st_size/(1024*1024)  #In MB
+        time_taken = time.time() - start
+        ic(f"Download completed ({round(size,2)} MB) in {round(time_taken,1)} sec(s) at {round(size/time_taken, 1)} MB/s")
+        return filepath
+
 class BS:
     def __init__(self) -> BeautifulSoup:
         self.bs = BeautifulSoup
-        return self.bs
+        return None
 
-    def get_soup(self, res:str):
+    def get_soup(self, res: requests.Response):
         return self.bs(res.text, "html.parser")
     
     def get_soup_list(self, res_text_list: list[str]) -> list:
@@ -208,3 +227,4 @@ class BS:
 
     def __str__(self) -> str:
         return "Beautifulsoup class with useful function methods"
+    

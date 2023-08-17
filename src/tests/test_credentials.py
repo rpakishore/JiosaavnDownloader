@@ -4,7 +4,7 @@ from unittest import mock
 import getpass
 
 # Import the module
-from template_python.credentials import *
+from jiosaavn.credentials import *
 
 @pytest.fixture(autouse=True)
 def mock_sys_platform(request):

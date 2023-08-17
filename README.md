@@ -1,24 +1,24 @@
 <!--- Heading --->
 <div align="center">
   <img src="assets/banner.png" alt="banner" width="auto" height="auto" />
-  <h1>Template README</h1>
+  <h1>Jiosaavn Music Download</h1>
   <p>
     An awesome README template for your projects! 
   </p>
 <h4>
-    <a href="https://github.com/rpakishore/Template-Python/">View Demo</a>
+    <a href="https://github.com/rpakishore/Jiosaavn/">View Demo</a>
   <span> · </span>
-    <a href="https://github.com/rpakishore/Template-Python">Documentation</a>
+    <a href="https://github.com/rpakishore/Jiosaavn">Documentation</a>
   <span> · </span>
-    <a href="https://github.com/rpakishore/Template-Python/issues/">Report Bug</a>
+    <a href="https://github.com/rpakishore/Jiosaavn/issues/">Report Bug</a>
   <span> · </span>
-    <a href="https://github.com/rpakishore/Template-Python/issues/">Request Feature</a>
+    <a href="https://github.com/rpakishore/Jiosaavn/issues/">Request Feature</a>
   </h4>
 </div>
 <br />
 
-![GitHub commit activity](https://img.shields.io/github/commit-activity/m/rpakishore/Template-Python)
-![GitHub last commit](https://img.shields.io/github/last-commit/rpakishore/Template-Python)
+![GitHub commit activity](https://img.shields.io/github/commit-activity/m/rpakishore/Jiosaavn)
+![GitHub last commit](https://img.shields.io/github/last-commit/rpakishore/Jiosaavn)
 <!-- Table of Contents -->
 <h2>Table of Contents</h2>
 
@@ -175,7 +175,7 @@ See LICENSE.txt for more information.
 
 Arun Kishore - [@rpakishore](mailto:pypi@rpakishore.co.in)
 
-Project Link: [https://github.com/rpakishore/Template-Python](https://github.com/rpakishore/Template-Python)
+Project Link: [https://github.com/rpakishore/Jiosaavn](https://github.com/rpakishore/Jiosaavn)
 
 <!-- Acknowledgments -->
 ## 9. Acknowledgements
