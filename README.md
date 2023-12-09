@@ -65,7 +65,7 @@ Clone repo and install with flit
 Alternatively, download the release and install with pip
 
 ```bash
-  pip install jiosaavn
+  pip install jiosaavn-0.0.1-py2.py3-none-any.whl
 ```
 
 <!-- Usage -->
