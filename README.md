@@ -35,8 +35,6 @@
     - [2.3.2. Development](#232-development)
 - [3. Usage](#3-usage)
   - [3.1. Development](#31-development)
-- [4. Modules](#4-modules)
-  - [4.1. requests\_package.py](#41-requests_packagepy)
 - [5. Roadmap](#5-roadmap)
 - [6. FAQ](#6-faq)
 - [7. License](#7-license)
@@ -89,10 +87,6 @@ To run this project, you will need to add the following environment variables to
 Create the virutual environment and install dependencies
 
 ```bash
-python -m venv .venv
-
-.venv\Scripts\activate.bat
-
 pip install flit
 ```
 
@@ -131,24 +125,6 @@ Use this space to tell a little more about your project and how it can be used. 
 3. Change the folder name from `src\template_python` to `src\<app_name>`, and propate the changes to the subfolders.
 4. Review the dependencies under `pyproject.toml` and remove as needed.
 5. Remove unneeded dependencies from `src\<app_name>\`
-
-## 4. Modules
-
-### 4.1. requests_package.py
-
-Includes frequently used requests packages, functions, classes and defaults
-The following functions are defined in the `req` class
-
-|Function Name| Purpose|
-|-------------|--------|
-|`randomize_header`|Randomize request headers by updating both referer and useragent|
-|`change_useragent`|Change request useragent to random one|
-|`change_referer`|Randomly set google.com as referer|
-|`get_from_list`|Complete requests to a list of urls and return the list of responses|
-|`get`|URL request with header randomization, timeout, proxy and retries builtin|
-|`proxy_get_from_list`|Complete requests to a list of urls and return the list of responses using proxy ips|
-|`proxy_get`|completes `get` request using proxies|
-|`create_session`|Generate sessions object with adequate headers and adapters|
 
 <!-- Roadmap -->
 ## 5. Roadmap

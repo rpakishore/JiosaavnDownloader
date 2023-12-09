@@ -1,10 +1,13 @@
 from dataclasses import dataclass
 from jiosaavn.file_parser import Song
-from jiosaavn.debugger import ic
-from jiosaavn.request_package import Req
+from pathlib import Path
+from ak_requests import RequestsSession
+from . import log, ic
+ic.configureOutput(prefix=f'{Path(__file__).name} -> ')
+
 
 class SaavnAPI:
-    session = Req()
+    session = RequestsSession()
     def __init__(self, baseurl: str, port: int = 80):
         self.baseurl = baseurl
         self.port = port
@@ -20,14 +23,14 @@ class SaavnAPI:
         data = self.session.get(f"{self.url}/song/?query={url}").json()
         return _song_from_json(data)
     
-    def playlist(self, url: str) -> tuple[Song]:
+    def playlist(self, url: str) -> list[Song]:
         data = self.session.get(f"{self.url}/result/?query={url}").json()
-        return (_song_from_json(song) for song in data.get('songs'))
+        return [_song_from_json(song) for song in data.get('songs')]
 
             
 def _song_from_json(data: dict) -> Song:
-    if type(data.get('artistMap')) == dict:
-        artists = list(data.get('artistMap').keys())
+    if isinstance(_artist_map:=data.get('artistMap'), dict):
+        artists = list(_artist_map.keys())
     else:
         artists = []
 
@@ -39,5 +42,5 @@ def _song_from_json(data: dict) -> Song:
         primary_artists= data['primary_artists'].split(', '),
         artists= artists,
         year = int(data.get('year', 0)),
-        image_url= data.get('image')
+        image_url= data.get('image') # type: ignore
     )

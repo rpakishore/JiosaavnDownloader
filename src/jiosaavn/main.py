@@ -1,61 +1,51 @@
-from jiosaavn.debugger import ic
 from jiosaavn.api_parser import SaavnAPI
+from jiosaavn.API import SaavnMe
 from jiosaavn.file_parser import Song
-from jiosaavn.Cacher import Cache
+from jiosaavn.utils import Cache
 from pathlib import Path
+from typing import Literal
 
-class MainApp():
-    def __init__(self, baseurl: str, port: str, song_urls: list[str] = [], 
-                 playlist_urls: list[str] = [], cache_filepath: str= None, 
-                 skip_downloaded: bool = True, final_location: str = None
-                 ) -> None:
-        self.song_urls = song_urls
-        self.playlist_urls = playlist_urls
-        self.cache_filepath = cache_filepath
-        self.skip_downloaded = skip_downloaded
-        self.final_location = final_location
-        self.cache = Cache(Path(str(cache_filepath)))
-        self.saavn = SaavnAPI(baseurl=baseurl, port=port)
+from . import log, ic
+ic.configureOutput(prefix=f'{Path(__file__).name} -> ')
 
-        
-    def run(self) -> list[Song]:
-        cache_data = self.cache.data
-        for song in self.songlist:
-            try:
-                with song as f:
-                    f.download(final_name=f"")
-                    f.embed_metadata()
-                    if self.final_location:
-                        f.move(finalpath=Path(self.final_location))
-                    if self.skip_downloaded:
-                        cache_data.append(song)
-                        self.cache.write(cache_data)
-            except Exception as e:
-                print(str(e))
-            
-    @property
-    def songlist(self) -> list[Song]:
-        song_list = []
-        for url in self.song_urls:
-            try:
-                _song = self.saavn.song(url)
-            except Exception as e:
-                print(str(e))
-            if self.skip_downloaded and _song in self.cache.data:
-                continue
-            else:
-                song_list.append(_song)
-        
-        for url in self.playlist_urls:
-            for _song in self.saavn.song(url):
-                if self.skip_downloaded and _song in self.cache.data:
-                    continue
-                else:
-                    song_list.append(_song)
-        return song_list
+class JiosaavnDownload:
+    def __init__(self, cache_filepath: str|Path = Path('database.pkl'), final_location: Path|str = Path('.')) -> None:
+        self.cache_filepath: Path = Path(str(cache_filepath))
+        self.cache = Cache(filepath=self.cache_filepath)
+        self.set_downloader()
+        self.final_location: Path = Path(str(final_location))
     
-    def __str__(self) -> str:
-        return "MainApp Class for downloading from JioSaavn"
+    def set_downloader(self, downloader: SaavnMe = SaavnMe()):
+        self.ApiProvider = downloader
     
-    def __repr__(self) -> str:
-        return f"MainApp({self.song_urls=},{self.playlist_urls=}, {self.cache_filepath=}, {self.skip_downloaded}, {self.final_location=})"
+    def song(self, url: str, skip_downloaded: bool = True, debug_only: bool=False):
+        self._download_song(song=self.ApiProvider.song(url=url), 
+                            skip_downloaded=skip_downloaded, debug_only=debug_only)
+    
+    def _download_song(self, song: Song, skip_downloaded: bool, debug_only: bool):
+        with song:
+            if debug_only:
+                song.debug_mode = True
+            if skip_downloaded and self.check_downloaded(song):
+                log.debug(f'Skipping {song.name} from {song.album}, Downloaded on {song.download_date}')
+                return
+            _download_song(song=song, final_location=self.final_location)
+        if not debug_only:
+            _cache_data = self.cache.data
+            _cache_data.append(song)
+            self.cache.write(data = _cache_data)
+        else:
+            log.debug('Cache will be updated here.')
+    
+    def playlist(self, id: str|int, skip_downloaded: bool = True, debug_only: bool=False):
+        for song in self.ApiProvider.playlist(id=id):
+            self._download_song(song=song, skip_downloaded=skip_downloaded, debug_only=debug_only)
+        
+    def check_downloaded(self, song: Song) -> bool:
+        """Checks if the specified song has previously been downloaded"""
+        return song.id in [each.id for each in self.cache.data]
+    
+def _download_song(song: Song, final_location: Path|str) -> None:
+    song.download()
+    song.embed_metadata()
+    song.move(finalpath=final_location)

@@ -1,6 +1,7 @@
 #myLog.py
 import logging, getpass, time
 from pathlib import Path
+from icecream import ic
 
 class Log(object):
     #class CALog(logging.Logger):
@@ -9,14 +10,15 @@ class Log(object):
     def __init__(self):
         user=getpass.getuser()
         self.logger=logging.getLogger(user)
-        self.logger.setLevel(logging.DEBUG)
+        self.logger.setLevel(logging.INFO)
         format='%(asctime)s-%(levelname)s: %(message)s'
         formatter=logging.Formatter(format, datefmt='%Y%m%d-%H%M%S')
         streamhandler=logging.StreamHandler()
         streamhandler.setFormatter(formatter)
         self.logger.addHandler(streamhandler)
-        Path('logs').mkdir(exist_ok=True)
-        logfile = Path('logs') / f'{user}{time.strftime("-%Y-%b")}.log'
+        log_dir: Path = Path(__file__).parent.parent.parent / 'logs'
+        log_dir.mkdir(exist_ok=True)
+        logfile = log_dir / f'{user}{time.strftime("-%Y-%b")}.log'
         filehandler=logging.FileHandler(logfile, encoding="utf-8")
         filehandler.setFormatter(formatter)
         self.logger.addHandler(filehandler)
@@ -36,3 +38,5 @@ class Log(object):
         self.logger.setLevel(level)
     def disable(self):
         logging.disable(50)
+        
+log = Log()

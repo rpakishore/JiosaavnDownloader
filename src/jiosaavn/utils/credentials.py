@@ -1,7 +1,8 @@
 import sys
 if sys.platform=="win32":
     #pip install keyring
-    import keyring, getpass
+    import keyring
+    import getpass
 else:
     import getpass
 

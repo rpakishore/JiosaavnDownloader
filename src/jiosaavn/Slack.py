@@ -1,28 +1,67 @@
-# Import WebClient from Python SDK (github.com/slackapi/python-slack-sdk)
 from slack_sdk import WebClient
 from slack_sdk.errors import SlackApiError
-from jiosaavn.credentials import getpwd
 
-class Slack_instance:
+from jiosaavn.utils import getpwd
+from jiosaavn.utils import log
 
+class Blocks:
+    def __init__(self) -> None:
+        self.DIVIDER = {"type": "divider"}
+    
+    def TEXT(self, text: str, img_url: str='', img_alt: str ='') -> dict:
+        block = {
+                    "type": "section",
+                    "text": { "type": "mrkdwn", "text": text}
+                }
+        
+        if img_url != '':
+            block["accessory"] = {
+                        "type": "image",
+                        "image_url": img_url,
+                        "alt_text": img_alt
+                        }
+        return block
+        
+    def IMAGE(self, img_url: str, alt_txt: str='', text: str='') -> dict:
+        block: dict = {
+                "type": "image",
+                "image_url": img_url,
+                "alt_text": alt_txt
+                }
+        
+        if text != '':
+            block['title'] = {
+                "type": "plain_text",
+                "text": text,
+                "emoji": True
+                }
+        return block
+
+    def HEADER(self, text: str) -> dict:
+        return {
+			"type": "header",
+			"text": {
+				"type": "plain_text",
+				"text": text,
+				"emoji": True
+			}
+		}
+        
+class Slack:
     def __init__(self):
-        #GetSlack
         self.client = WebClient(token=getpwd('Slack-pythonbot', 'token'))
+        self.BLOCK = Blocks()
+        log.info('Slack Instance Initialized')
         return
-
-    # Destructor
-    def __del__(self):
-        return
-
-    def do_actions(self): 
-        return 0
+    
+    def __str__(self) -> str:
+        return "SlackAPI Instance"
+    
+    def __repr__(self) -> str:
+        return "Slack()"
 
     def channel_id(self, channel_name:str) -> str:
         """Returns channel id for the specified channel name
-        Args:
-            channel_name (str): Name of the slack channel
-        Returns:
-            str: Channel ID
         """
         return getpwd('Slack-pythonbot', channel_name)
 
@@ -30,67 +69,33 @@ class Slack_instance:
         self.block = []
         return
     
-    def msg(self, message:str, channel:str="python"):
+    def msg(self, message:str, channel:str="python") -> int:
         """Sends Slack message
-        Args:
-            message (str): Message to be sent
-            channel (str, optional): Slack channel to send the message to. Defaults to "#python".
         """
         err = 0
         try:
             _ = self.client.chat_postMessage(
                 channel=self.channel_id(channel),
                 text=message)
+            log.debug('Slack message sent')
         except SlackApiError as e:
             # You will get a SlackApiError if "ok" is False
-            print(f'NG - Slack message not sent: {str(e)}')
+            log.error(f'NG - Slack message not sent: {str(e)}')
             err = 1
         return err
     
-        
-    def add_text(self, text, image_url=None,image_alt_text=""):
-        """Adds markdown element to block message
-        Args:
-            text (str): Text to display
-            image_url (str, optional): Image to display. Defaults to None.
-            image_alt_text (str, optional): Alt string for image. Defaults to "".
-        """ 
-        if not image_url:
-            self.block.append(
-                {
-                    "type": "section",
-                    "text": { "type": "mrkdwn", "text": text}
-                })
-        else:
-            self.block.append(
-                {
-                    "type": "section",
-                    "text": {"type": "mrkdwn", "text": text},
-                    "accessory": {
-                        "type": "image",
-                        "image_url": image_url,
-                        "alt_text": image_alt_text
-                    }
-                })
-            
-        return
-    
-    def add_divider(self):
-        """Adds divider to the block message
-        """
-        self.block.append({"type": "divider"})
-        return
-    
-    def post_block(self, channel):
+    def post_block(self, channel: str, blocks: list[dict]):
         """Posts the currently constructed block to slack chat
         Args:
             channel (str): Channel name
         """
         err = 0
         try:
-            response = self.client.chat_postMessage(channel=self.channel_id(channel),blocks=self.block)
+            _ = self.client.chat_postMessage(channel=self.channel_id(channel),
+                                                    blocks=blocks)
+            log.debug('Slack block sent successfully')
         except SlackApiError as e:
             # You will get a SlackApiError if "ok" is False
-            print(f'NG - Slack message not sent: {str(e)}')
+            log.error(f'NG - Slack message not sent: {str(e)}')
             err = 1
         return err

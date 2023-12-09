@@ -14,17 +14,17 @@ dependencies = [
     "typer[all]",   #cli_app.py
     "icecream",     
     "slack_sdk",    #Slack.py
-    "requests",   #request_package
+    "ak_requests",   #request_package
     "beautifulsoup4",   #request_package
     "ffmpy",
-    "eyed3"
+    "eyed3",
+    "keyring","brotlipy"
 ]
 
 [project.optional-dependencies]
 test = [
     "pytest",
-    "ipykernel",
-    "pandasgui"
+    "ipykernel"
 ]
 
 [project.urls]
