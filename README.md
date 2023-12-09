@@ -1,80 +1,46 @@
 <!--- Heading --->
 <div align="center">
-  <img src="assets/banner.png" alt="banner" width="auto" height="auto" />
-  <h1>Jiosaavn Music Download</h1>
+  <h1>Jiosaavn Downloader</h1>
   <p>
-    An awesome README template for your projects! 
+    Download Jiosaavn mp3 from unofficial API
   </p>
 <h4>
-    <a href="https://github.com/rpakishore/Jiosaavn/">View Demo</a>
+    <a href="https://github.com/rpakishore/JiosaavnDownloader/">View Demo</a>
   <span> · </span>
-    <a href="https://github.com/rpakishore/Jiosaavn">Documentation</a>
+    <a href="https://github.com/rpakishore/JiosaavnDownloader">Documentation</a>
   <span> · </span>
-    <a href="https://github.com/rpakishore/Jiosaavn/issues/">Report Bug</a>
+    <a href="https://github.com/rpakishore/JiosaavnDownloader/issues/">Report Bug</a>
   <span> · </span>
-    <a href="https://github.com/rpakishore/Jiosaavn/issues/">Request Feature</a>
+    <a href="https://github.com/rpakishore/JiosaavnDownloader/issues/">Request Feature</a>
   </h4>
 </div>
 <br />
 
-![GitHub commit activity](https://img.shields.io/github/commit-activity/m/rpakishore/Jiosaavn)
-![GitHub last commit](https://img.shields.io/github/last-commit/rpakishore/Jiosaavn)
+![GitHub commit activity](https://img.shields.io/github/commit-activity/m/rpakishore/JiosaavnDownloader)
+![GitHub last commit](https://img.shields.io/github/last-commit/rpakishore/JiosaavnDownloader)
 <!-- Table of Contents -->
 <h2>Table of Contents</h2>
 
 - [1. About the Project](#1-about-the-project)
-  - [1.1. Screenshots](#11-screenshots)
-  - [1.2. Features](#12-features)
-  - [1.3. Color Reference](#13-color-reference)
-  - [1.4. Environment Variables](#14-environment-variables)
+  - [1.1. Features](#11-features)
 - [2. Getting Started](#2-getting-started)
   - [2.1. Prerequisites](#21-prerequisites)
-  - [2.2. Dependencies](#22-dependencies)
-  - [2.3. Installation](#23-installation)
-    - [2.3.1. Production](#231-production)
-    - [2.3.2. Development](#232-development)
+  - [2.2. Installation](#22-installation)
 - [3. Usage](#3-usage)
-  - [3.1. Development](#31-development)
-- [5. Roadmap](#5-roadmap)
-- [6. FAQ](#6-faq)
-- [7. License](#7-license)
-- [8. Contact](#8-contact)
-- [9. Acknowledgements](#9-acknowledgements)
+- [4. Roadmap](#4-roadmap)
+- [5. License](#5-license)
+- [6. Contact](#6-contact)
+- [7. Acknowledgements](#7-acknowledgements)
 
 <!-- About the Project -->
 ## 1. About the Project
-<!-- Screenshots -->
-### 1.1. Screenshots
-
-<div align="center"> 
-  <img src="https://placehold.co/600x400?text=Your+Screenshot+here" alt="screenshot" />
-</div>
 
 <!-- Features -->
-### 1.2. Features
+### 1.1. Features
 
-- Feature 1
-- Feature 2
-- Feature 3
-
-<!-- Color Reference -->
-### 1.3. Color Reference
-
-| Color             | Hex                                                                |
-| ----------------- | ------------------------------------------------------------------ |
-| Primary Color | ![#222831](https://via.placeholder.com/10/222831?text=+) #222831 |
-| Secondary Color | ![#393E46](https://via.placeholder.com/10/393E46?text=+) #393E46 |
-| Accent Color | ![#00ADB5](https://via.placeholder.com/10/00ADB5?text=+) #00ADB5 |
-| Text Color | ![#EEEEEE](https://via.placeholder.com/10/EEEEEE?text=+) #EEEEEE |
-
-<!-- Env Variables -->
-### 1.4. Environment Variables
-
-To run this project, you will need to add the following environment variables to your .env file
-
-`API_KEY`
-
-`ANOTHER_API_KEY`
+- Currently uses free saavn.me api endpoints, additional endpoints can easily be added.
+- Holds memory of previously downloaded files to prevent re-downloads.
+- Can handle individual songs and playlists
 
 <!-- Getting Started -->
 ## 2. Getting Started
@@ -82,83 +48,87 @@ To run this project, you will need to add the following environment variables to
 <!-- Prerequisites -->
 ### 2.1. Prerequisites
 
-### 2.2. Dependencies
-
-Create the virutual environment and install dependencies
-
-```bash
-pip install flit
-```
+python 3.11+
 
 <!-- Installation -->
-### 2.3. Installation
+### 2.2. Installation
 
-#### 2.3.1. Production
-
-Install with flit
+Clone repo and install with flit
 
 ```bash
+  git clone https://github.com/rpakishore/JiosaavnDownloader.git
+  cd JiosaavnDownloader
+  pip install flit
   flit install --deps production
 ```
 
-#### 2.3.2. Development
-
-Install with flit
+Alternatively, download the release and install with pip
 
 ```bash
-  flit install --pth-file
+  pip install jiosaavn
 ```
 
 <!-- Usage -->
 ## 3. Usage
 
-Use this space to tell a little more about your project and how it can be used. Show additional screenshots, code samples, demos or link to other resources.
+Can be used as python package or through cli.
+
+For cli, try
 
 ```bash
-  app --help
+  jiosaavn --help
 ```
 
-### 3.1. Development
+For python package
 
-1. Open the project directory in vscode
-2. Update the app name under `pyproject.toml`
-3. Change the folder name from `src\template_python` to `src\<app_name>`, and propate the changes to the subfolders.
-4. Review the dependencies under `pyproject.toml` and remove as needed.
-5. Remove unneeded dependencies from `src\<app_name>\`
+```python
+#Initialize
+from jiosaavn import JiosaavnDownload
+from jiosaavn.API import SaavnMe
+
+#Choose the database filepath & Final music location
+saavn = JiosaavnDownload(cache_filepath='database.pkl', final_location='Y:\\Music')
+#Choose downloader
+saavn.set_downloader(downloader=SaavnMe())
+#Download song, skip if previously downloaded
+saavn.song(url='https://www.jiosaavn.com/album/sambar/MP5Da7jEhBQ_', skip_downloaded=True)
+#Download all songs in playlists
+playlists = [
+    '109815423',        #Top Kuthu - Tamil
+    '799619460',        #Tamil EDM,
+    '1134651042',       #Tamil: India Superhits Top 50
+    '80802063',         #Tamil Viral Hits
+    '109118539',        #Motivational Hits - Tamil
+    '83412571',         #Workout Beats - Tamil
+    '837803163',        #Chill Hits - Tamil,
+    '696005328',        #House Party - Tamil
+    '67691546',         #Semma Mass - Tamil
+    '1134705865',       #Malayalam: India Superhits Top 50
+]
+for playlist in playlists:
+    saavn.playlist(id=playlist)
+```
 
 <!-- Roadmap -->
-## 5. Roadmap
+## 4. Roadmap
 
-- [x] Set up a skeletal framework
-- [ ] Todo 2
-
-<!-- FAQ -->
-## 6. FAQ
-
-- Question 1
-  - Answer 1
-
-- Question 2
-  - Answer 2
+- [ ] Additional endpoints
 
 <!-- License -->
-## 7. License
+## 5. License
 
 See LICENSE.txt for more information.
 
 <!-- Contact -->
-## 8. Contact
+## 6. Contact
 
 Arun Kishore - [@rpakishore](mailto:pypi@rpakishore.co.in)
 
-Project Link: [https://github.com/rpakishore/Jiosaavn](https://github.com/rpakishore/Jiosaavn)
+Project Link: [https://github.com/rpakishore/JiosaavnDownloader](https://github.com/rpakishore/JiosaavnDownloader)
 
 <!-- Acknowledgments -->
-## 9. Acknowledgements
+## 7. Acknowledgements
 
 Use this section to mention useful resources and libraries that you have used in your projects.
 
-- [Awesome README Template](https://github.com/Louis3797/awesome-readme-template/blob/main/README-WITHOUT-EMOJI.md)
-- [Banner Maker](https://banner.godori.dev/)
-- [Shields.io](https://shields.io/)
-- [Carbon](https://carbon.now.sh/)
+- [saavn.me](https://github.com/sumitkolhe/jiosaavn-api)
