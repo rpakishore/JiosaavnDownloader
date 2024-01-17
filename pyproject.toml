@@ -17,7 +17,7 @@ dependencies = [
     "ffmpy==0.3.1",
     "eyed3==0.9.7",
     "keyring==24.3.0",
-    "brotlipy==1.1.0"
+    "brotlipy"
 ]
 
 [project.optional-dependencies]
