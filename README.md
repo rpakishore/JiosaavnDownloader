@@ -5,10 +5,6 @@
     Download Jiosaavn mp3 from unofficial API
   </p>
 <h4>
-    <a href="https://github.com/rpakishore/JiosaavnDownloader/">View Demo</a>
-  <span> · </span>
-    <a href="https://github.com/rpakishore/JiosaavnDownloader">Documentation</a>
-  <span> · </span>
     <a href="https://github.com/rpakishore/JiosaavnDownloader/issues/">Report Bug</a>
   <span> · </span>
     <a href="https://github.com/rpakishore/JiosaavnDownloader/issues/">Request Feature</a>
@@ -41,6 +37,7 @@
 - Currently uses free saavn.me api endpoints, additional endpoints can easily be added.
 - Holds memory of previously downloaded files to prevent re-downloads.
 - Can handle individual songs and playlists
+- Can send download notifications through gotify
 
 <!-- Getting Started -->
 ## 2. Getting Started
@@ -90,7 +87,7 @@ from jiosaavn.API import SaavnMe
 saavn = JiosaavnDownload(cache_filepath='database.pkl', final_location='Y:\\Music')
 #Choose downloader
 saavn.set_downloader(downloader=SaavnMe())
-#Set Gotify Notifications; Can skip if not needed
+#Set Gotify Notifications; Can skip if not needed; Will prompt for API Key on first run.
 saavn.GOTIFY_CHANNEL = "Media"
 #Download song, skip if previously downloaded
 saavn.song(url='https://www.jiosaavn.com/album/sambar/MP5Da7jEhBQ_', skip_downloaded=True)
@@ -130,7 +127,5 @@ Project Link: [https://github.com/rpakishore/JiosaavnDownloader](https://github.
 
 <!-- Acknowledgments -->
 ## 7. Acknowledgements
-
-Use this section to mention useful resources and libraries that you have used in your projects.
 
 - [saavn.me](https://github.com/sumitkolhe/jiosaavn-api)
