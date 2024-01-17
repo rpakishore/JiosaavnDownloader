@@ -144,10 +144,18 @@ class Song:
     
     @property
     def filename(self) -> str:
+        log.debug(f'{self.sanitized_name=}, {self.sanitized_album=}')
+        return f'{self.sanitized_name}-{self.sanitized_album}({self.year if self.year !=0 else ""}).mp3'
+    
+    @property
+    def sanitized_name(self) -> str:
         song_name:str = html.unescape(self.name)
         song_name = re.sub(r' ?\(From ".*"\)', '', song_name)
+        return song_name
+    
+    @property
+    def sanitized_album(self) -> str:
         album_name: str = html.unescape(self.album)
         if _album:=re.findall(r'\(From "(.*)"\)',album_name):
             album_name = _album[0]
-        log.debug(f'{song_name=}, {album_name=}')
-        return f'{song_name}-{album_name}({self.year if self.year !=0 else ""}).mp3'
+        return album_name
