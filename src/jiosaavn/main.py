@@ -6,9 +6,16 @@ from pathlib import Path
 from typing import Literal
 
 from . import log, ic
+from .notify.Gotify import notify
+
+
 ic.configureOutput(prefix=f'{Path(__file__).name} -> ')
 
 class JiosaavnDownload:
+    
+    GOTIFY_CHANNEL: str|None = None
+    GOTIFY_URL: str = "https://gotify.rpakishore.co.in"
+    
     def __init__(self, cache_filepath: str|Path = Path('database.pkl'), final_location: Path|str = Path('.')) -> None:
         self.cache_filepath: Path = Path(str(cache_filepath))
         self.cache = Cache(filepath=self.cache_filepath)
@@ -30,12 +37,22 @@ class JiosaavnDownload:
                 log.debug(f'Skipping {song.name} from {song.album}, Downloaded on {song.download_date}')
                 return
             _download_song(song=song, final_location=self.final_location)
+        
+        if self.GOTIFY_CHANNEL:
+            self.__gotify(song)
         if not debug_only:
             _cache_data = self.cache.data
             _cache_data.append(song)
             self.cache.write(data = _cache_data)
         else:
             log.debug('Cache will be updated here.')
+            
+    def __gotify(self, song:Song) -> None:
+        assert self.GOTIFY_CHANNEL is not None
+        _title = f'Jiosaavn Downloader - {song.name}'
+        _msg = f'Album: {song.album}'
+        notify(app=self.GOTIFY_CHANNEL,title=_title, message=_msg, 
+                priority=2,url=self.GOTIFY_URL)
     
     def playlist(self, id: str|int, skip_downloaded: bool = True, debug_only: bool=False):
         for song in self.ApiProvider.playlist(id=id):
