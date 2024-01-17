@@ -90,6 +90,8 @@ from jiosaavn.API import SaavnMe
 saavn = JiosaavnDownload(cache_filepath='database.pkl', final_location='Y:\\Music')
 #Choose downloader
 saavn.set_downloader(downloader=SaavnMe())
+#Set Gotify Notifications; Can skip if not needed
+saavn.GOTIFY_CHANNEL = "Media"
 #Download song, skip if previously downloaded
 saavn.song(url='https://www.jiosaavn.com/album/sambar/MP5Da7jEhBQ_', skip_downloaded=True)
 #Download all songs in playlists
