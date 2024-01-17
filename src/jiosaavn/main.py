@@ -49,8 +49,8 @@ class JiosaavnDownload:
             
     def __gotify(self, song:Song) -> None:
         assert self.GOTIFY_CHANNEL is not None
-        _title = f'Jiosaavn Downloader - {song.name}'
-        _msg = f'Album: {song.album}'
+        _title = f'[Jiosaavn]{song.sanitized_name}'
+        _msg = f'Album: {song.sanitized_album}'
         notify(app=self.GOTIFY_CHANNEL,title=_title, message=_msg, 
                 priority=2,url=self.GOTIFY_URL)
     
