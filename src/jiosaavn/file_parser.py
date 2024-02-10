@@ -116,10 +116,10 @@ class Song:
             if audiofile.tag is None:
                 return self.filepath
             audiofile.tag.artist = ', '.join(self.primary_artists)
-            audiofile.tag.album = self.album
+            audiofile.tag.album = self.sanitized_album
             
             audiofile.tag.album_artist = "" if self.artists == [] else ', '.join(self.artists)
-            audiofile.tag.title = self.name
+            audiofile.tag.title = self.sanitized_name
             
             if self.year != 0:
                 audiofile.tag.year = self.year
@@ -128,7 +128,7 @@ class Song:
                 audiofile.tag.images.set(3, self.image, "image/jpeg", u"cover")
             audiofile.tag.save()
             
-            log.info(f"Metadata written for {self.name}")
+            log.info(f"Metadata written for {self.sanitized_name}")
         else:
             log.debug(f'Embed metadata for {self.filepath}')
         return self.filepath

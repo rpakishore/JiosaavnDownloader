@@ -34,7 +34,7 @@ class JiosaavnDownload:
             if debug_only:
                 song.debug_mode = True
             if skip_downloaded and self.check_downloaded(song):
-                log.debug(f'Skipping {song.name} from {song.album}, Downloaded on {song.download_date}')
+                log.debug(f'Skipping {song.sanitized_name} from {song.sanitized_album}, Downloaded on {song.download_date}')
                 return
             _download_song(song=song, final_location=self.final_location)
         
