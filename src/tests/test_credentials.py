@@ -4,7 +4,7 @@ from unittest import mock
 import getpass
 
 # Import the module
-from jiosaavn.credentials import *
+from jiosaavn.utils.credentials import *
 
 @pytest.fixture(autouse=True)
 def mock_sys_platform(request):
@@ -34,7 +34,7 @@ def test_getpwd_linux(monkeypatch):
     monkeypatch.setattr(getpass, 'getpass', lambda prompt: expected_password)
     
     # Call the function
-    password = getpwd(item, username)
+    password = get_password(item, username)
     
     # Assert the password
     assert password == expected_password
