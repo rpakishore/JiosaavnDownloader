@@ -90,7 +90,7 @@ saavn.set_downloader(downloader=SaavnMe())
 #Set Gotify Notifications; Can skip if not needed; Will prompt for API Key on first run.
 saavn.GOTIFY_CHANNEL = "Media"
 #Download song, skip if previously downloaded
-saavn.song(url='https://www.jiosaavn.com/album/sambar/MP5Da7jEhBQ_', skip_downloaded=True)
+saavn.song(url='https://www.jiosaavn.com/song/houdini/OgwhbhtDRwM', skip_downloaded=True)
 #Download all songs in playlists
 playlists = [
     '109815423',        #Top Kuthu - Tamil
@@ -128,4 +128,4 @@ Project Link: [https://github.com/rpakishore/JiosaavnDownloader](https://github.
 <!-- Acknowledgments -->
 ## 7. Acknowledgements
 
-- [saavn.me](https://github.com/sumitkolhe/jiosaavn-api)
+- [saavn.dev](https://github.com/sumitkolhe/jiosaavn-api)
