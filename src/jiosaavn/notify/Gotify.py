@@ -12,6 +12,10 @@ def notify(app: str, title: str, message: str="", priority: int=2,
                             json={
                                 "message": message,
                                 "priority": priority,
-                                "title": title
+                                "title": title,
+                                "extras": {
+                                    "client::display": {
+                                    "contentType": "text/markdown"
+                                    }}
                             })
     log.info(f'[GOTIFY]Response: {resp}')
