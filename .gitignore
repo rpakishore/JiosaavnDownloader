@@ -131,3 +131,4 @@ dmypy.json
 WebDriver/chromedriver.exe
 nosync*
 development.ipynb
+*.pkl
