@@ -73,7 +73,7 @@ class Song:
         
             start = time.time()
             FFmpeg(
-                inputs={media_url:None},
+                inputs={media_url:'-hide_banner -loglevel error'},
                 outputs={final_name: None}
             ).run()
         
