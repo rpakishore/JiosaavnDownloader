@@ -133,3 +133,4 @@ nosync*
 development.ipynb
 *.pkl
 config.toml
+*.mp3
