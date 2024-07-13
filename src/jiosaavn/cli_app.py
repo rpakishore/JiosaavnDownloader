@@ -15,7 +15,7 @@ app = typer.Typer()
 @app.command()
 def playlist(
     id: str,
-    final_path: str|None = None):
+    final_path: str = ''):
     """Downloads the songs from specified playlist
     """
     final_path = get_final_path(final_path)
@@ -25,14 +25,14 @@ def playlist(
 @app.command()
 def song(
     url: str,
-    final_path: str|None = None):
+    final_path: str = ''):
     """Downloads the songs from specified playlist
     """
     final_path = get_final_path(final_path)
     saavn = JiosaavnDownload(final_location=final_path)
     saavn.song(url, skip_downloaded=True)
 
-def get_final_path(final_path: str|None = None) -> Path:
+def get_final_path(final_path: str = '') -> Path:
     config_path: Path = Path(__file__).parent.parent.parent / 'config.toml'
     if config_path.exists():
         with open(config_path, 'r') as f:
@@ -40,10 +40,10 @@ def get_final_path(final_path: str|None = None) -> Path:
     else: 
         config = {}
     
-    if final_path is None:
-        final_path = config.get('paths', {}).get('destination', None)
+    if final_path == '':
+        final_path = config.get('paths', {}).get('destination', '')
     
-    if final_path is None:
+    if final_path == '':
         raise Exception('Please create a config.toml file in the root directory or pass in `final_path`')
     
     return final_path
