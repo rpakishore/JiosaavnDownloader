@@ -15,7 +15,7 @@ ic.configureOutput(prefix=f'{Path(__file__).name} -> ')
 class JiosaavnDownload:
     
     GOTIFY_CHANNEL: str|None = None
-    GOTIFY_URL: str = "https://gotify.rpakishore.co.in"
+    __gotify_key: str|None = None
     
     def __init__(self, cache_filepath: str|None = Path('database.pkl'), final_location: Path|None = None) -> None:
         
@@ -24,6 +24,13 @@ class JiosaavnDownload:
             cache_filepath = Path(config.get('db_folder', '.')) / 'database.pkl'
         if final_location is None:
             final_location = Path(config.get('destination', '.'))
+            
+        channel_name = config.get('gotify', {}).get('app_name', '')
+        if channel_name != '':
+            self.GOTIFY_CHANNEL = channel_name
+            self.GOTIFY_URL = config.get('gotify', {}).get('url', '')
+            if key:=config.get('gotify', {}).get('app_key', '') != '':
+                self.__gotify_key = key
         
         self.cache_filepath: Path = Path(str(cache_filepath))
         self.cache = Cache(filepath=self.cache_filepath)
@@ -60,7 +67,7 @@ class JiosaavnDownload:
         _title = f'[Jiosaavn]{song.sanitized_name}'
         _msg = f'Album: {song.sanitized_album}\n\n ![]({song.image_url})'
         notify(app=self.GOTIFY_CHANNEL,title=_title, message=_msg, 
-                priority=2,url=self.GOTIFY_URL)
+                priority=2,url=self.GOTIFY_URL, apptoken=self.__gotify_key)
     
     def playlist(self, id_link: str|int, skip_downloaded: bool = True, debug_only: bool=False):
         if id_link.startswith('http') or id_link.startswith('www'):
