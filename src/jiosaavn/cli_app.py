@@ -1,12 +1,11 @@
 import typer
-from rich import print
 from pathlib import Path
 from jiosaavn import JiosaavnDownload
 
 import tomllib
 
 #Default import to globally enable/disable debugger
-from . import log, ic
+from . import ic
 ic.configureOutput(prefix=f'{Path(__file__).name} -> ')
 
 
