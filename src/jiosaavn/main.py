@@ -17,14 +17,16 @@ class JiosaavnDownload:
     GOTIFY_CHANNEL: str|None = None
     __gotify_key: str|None = None
     
-    def __init__(self, cache_filepath: str|None = Path('database.pkl'), final_location: Path|None = None) -> None:
+    def __init__(self, cache_filepath: str|None = None, final_location: Path|None = None) -> None:
         
         config = get_config()
         if cache_filepath is None:
-            cache_filepath = Path(config.get('db_folder', '.')) / 'database.pkl'
+            cache_filepath = Path(config.get('paths',{}).get('db_folder', '.')) / 'database.pkl'
         if final_location is None:
-            final_location = Path(config.get('destination', '.'))
-            
+            final_location = Path(config.get('paths',{}).get('destination', '.'))
+        
+        log.info(f'Accessing database file at {cache_filepath}')
+        log.info(f'Final destination set to {final_location}')
         channel_name = config.get('gotify', {}).get('app_name', '')
         if channel_name != '':
             self.GOTIFY_CHANNEL = channel_name
@@ -70,7 +72,7 @@ class JiosaavnDownload:
                 priority=2,url=self.GOTIFY_URL, apptoken=self.__gotify_key)
     
     def playlist(self, id_link: str|int, skip_downloaded: bool = True, debug_only: bool=False):
-        if id_link.startswith('http') or id_link.startswith('www'):
+        if isinstance(id_link, str) and (id_link.startswith('http') or id_link.startswith('www')):
             songs = self.ApiProvider.playlist(link=id_link)
         else:
             songs = self.ApiProvider.playlist(id=id_link)
@@ -87,10 +89,11 @@ def _download_song(song: Song, final_location: Path|str) -> None:
     song.move(finalpath=final_location)
     
 def get_config() -> dict:
-    config_path: Path = Path(__file__).parent.parent.parent / 'config.json'
+    config_path: Path = Path(__file__).parent.parent.parent / 'config.toml'
+    log.info(config_path)
     if config_path.exists():
         with open(config_path, 'r') as f:
-            config = tomllib.loads(f.read())
+            return tomllib.loads(f.read())
     else: 
         config = {}
     return config

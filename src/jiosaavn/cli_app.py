@@ -29,11 +29,11 @@ def song(
     """Downloads the songs from specified playlist
     """
     final_path = get_final_path(final_path)
-    saavn = JiosaavnDownload(final_location='Y:\\Music')
+    saavn = JiosaavnDownload(final_location=final_path)
     saavn.song(url, skip_downloaded=True)
 
 def get_final_path(final_path: str|None = None) -> Path:
-    config_path: Path = Path(__file__).parent.parent.parent / 'config.json'
+    config_path: Path = Path(__file__).parent.parent.parent / 'config.toml'
     if config_path.exists():
         with open(config_path, 'r') as f:
             config = tomllib.loads(f.read())
