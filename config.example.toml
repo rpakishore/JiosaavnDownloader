@@ -1,0 +1,3 @@
+[paths]
+db_folder='''.'''   # This is folder where database.pkl file is stored
+destination='''.''' # This is folder where music will be stored

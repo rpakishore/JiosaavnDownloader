@@ -4,6 +4,7 @@ from jiosaavn.file_parser import Song
 from jiosaavn.utils import Cache
 from pathlib import Path
 from typing import Literal
+import tomllib
 
 from . import log, ic
 from .notify.Gotify import notify
@@ -16,7 +17,14 @@ class JiosaavnDownload:
     GOTIFY_CHANNEL: str|None = None
     GOTIFY_URL: str = "https://gotify.rpakishore.co.in"
     
-    def __init__(self, cache_filepath: str|Path = Path('database.pkl'), final_location: Path|str = Path('.')) -> None:
+    def __init__(self, cache_filepath: str|None = Path('database.pkl'), final_location: Path|None = None) -> None:
+        
+        config = get_config()
+        if cache_filepath is None:
+            cache_filepath = Path(config.get('db_folder', '.')) / 'database.pkl'
+        if final_location is None:
+            final_location = Path(config.get('destination', '.'))
+        
         self.cache_filepath: Path = Path(str(cache_filepath))
         self.cache = Cache(filepath=self.cache_filepath)
         self.set_downloader()
@@ -70,3 +78,12 @@ def _download_song(song: Song, final_location: Path|str) -> None:
     song.download()
     song.embed_metadata()
     song.move(finalpath=final_location)
+    
+def get_config() -> dict:
+    config_path: Path = Path(__file__).parent.parent.parent / 'config.json'
+    if config_path.exists():
+        with open(config_path, 'r') as f:
+            config = tomllib.loads(f.read())
+    else: 
+        config = {}
+    return config
