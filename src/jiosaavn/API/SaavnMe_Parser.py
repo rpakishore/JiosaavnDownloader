@@ -29,10 +29,20 @@ class SaavnMe:
             case 'song':
                 return f'{self.BASEURL}api/songs'
             
-    def playlist(self, id: int|str) -> list[Song]:
+    def playlist(self, id: int|str|None = None, link: str|None = None) -> list[Song]:
         """Provides a list of Song dataclass from the playlist id"""
-        log.info(f'Extracting Playlist Info with ID: {id}')
-        url: str = f"{self.url(type='playlist')}?id={id}&limit=1000"
+        if id is None and link is None:
+            raise Exception('Playlist ID or Link is required')
+        if id is not None and link is not None:
+            raise Exception('Provide only one of playlist or link')
+        if id is not None:
+            log.info(f'Extracting Playlist Info with ID: {id}')
+            url: str = f"{self.url(type='playlist')}?id={id}&limit=1000"
+        else:
+            if link.startswith('www'):
+                link = f'https://{link}'
+            log.info(f'Extracting Playlist Info with Link: {link}')
+            url: str = f"{self.url(type='playlist')}?link={link}&limit=1000"
         _res = self.SESSION.get(url)
         data: dict = json.loads(_res.content.decode())['data']
         

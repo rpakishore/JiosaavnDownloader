@@ -54,8 +54,12 @@ class JiosaavnDownload:
         notify(app=self.GOTIFY_CHANNEL,title=_title, message=_msg, 
                 priority=2,url=self.GOTIFY_URL)
     
-    def playlist(self, id: str|int, skip_downloaded: bool = True, debug_only: bool=False):
-        for song in self.ApiProvider.playlist(id=id):
+    def playlist(self, id_link: str|int, skip_downloaded: bool = True, debug_only: bool=False):
+        if id_link.startswith('http') or id_link.startswith('www'):
+            songs = self.ApiProvider.playlist(link=id_link)
+        else:
+            songs = self.ApiProvider.playlist(id=id_link)
+        for song in songs:
             self._download_song(song=song, skip_downloaded=skip_downloaded, debug_only=debug_only)
         
     def check_downloaded(self, song: Song) -> bool:
