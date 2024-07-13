@@ -132,3 +132,4 @@ WebDriver/chromedriver.exe
 nosync*
 development.ipynb
 *.pkl
+config.toml
