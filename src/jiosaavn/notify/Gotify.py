@@ -18,4 +18,4 @@ def notify(app: str, title: str, message: str="", priority: int=2,
                                     "contentType": "text/markdown"
                                     }}
                             })
-    log.info(f'[GOTIFY]Response: {resp}')
+    log.debug(f'[GOTIFY]Response: {resp}')
