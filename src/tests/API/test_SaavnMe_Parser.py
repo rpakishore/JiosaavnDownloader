@@ -23,6 +23,16 @@ def test_song_retrieval(saavn):
     assert song.media_url != ''
 
 def test_playlist_retrieval(saavn):
-    pl = saavn.playlist('109815423')
+    pl = saavn.playlist(id = '109815423')
+    assert len(pl) > 10
+    assert pl[0].id != pl[1].id
+
+def test_playlist_links(saavn):
+    pl = saavn.playlist(link = 'https://www.jiosaavn.com/featured/tamil-2010s/,H6xc4W4ZinDN85e-DKVsA__')
+    assert len(pl) > 10
+    assert pl[0].id != pl[1].id
+
+def test_playlist_links(saavn):
+    pl = saavn.playlist(link = 'www.jiosaavn.com/featured/tamil-2010s/,H6xc4W4ZinDN85e-DKVsA__')
     assert len(pl) > 10
     assert pl[0].id != pl[1].id

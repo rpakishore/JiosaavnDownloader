@@ -1,0 +1,8 @@
+[paths]
+db_folder='''.'''   # This is folder where database.pkl file is stored
+destination='''.''' # This is folder where music will be stored
+
+[gotify]
+url='https://gotify.example.com'  # Gotify server url
+app_name=''
+app_key=''  # Alternatively set this to "" and save the app_key to keyring under ('gotify', 'app_key')

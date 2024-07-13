@@ -30,4 +30,4 @@ test = [
 Home = "https://github.com/rpakishore/Template-Python"
 
 [project.scripts]
-jiosaavn="jiosaavn.cli_app:app"
+app="jiosaavn.cli_app:app"

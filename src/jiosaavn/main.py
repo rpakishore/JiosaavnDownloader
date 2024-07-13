@@ -4,6 +4,7 @@ from jiosaavn.file_parser import Song
 from jiosaavn.utils import Cache
 from pathlib import Path
 from typing import Literal
+import tomllib
 
 from . import log, ic
 from .notify.Gotify import notify
@@ -14,9 +15,23 @@ ic.configureOutput(prefix=f'{Path(__file__).name} -> ')
 class JiosaavnDownload:
     
     GOTIFY_CHANNEL: str|None = None
-    GOTIFY_URL: str = "https://gotify.rpakishore.co.in"
+    __gotify_key: str|None = None
     
-    def __init__(self, cache_filepath: str|Path = Path('database.pkl'), final_location: Path|str = Path('.')) -> None:
+    def __init__(self, cache_filepath: str|None = Path('database.pkl'), final_location: Path|None = None) -> None:
+        
+        config = get_config()
+        if cache_filepath is None:
+            cache_filepath = Path(config.get('db_folder', '.')) / 'database.pkl'
+        if final_location is None:
+            final_location = Path(config.get('destination', '.'))
+            
+        channel_name = config.get('gotify', {}).get('app_name', '')
+        if channel_name != '':
+            self.GOTIFY_CHANNEL = channel_name
+            self.GOTIFY_URL = config.get('gotify', {}).get('url', '')
+            if key:=config.get('gotify', {}).get('app_key', '') != '':
+                self.__gotify_key = key
+        
         self.cache_filepath: Path = Path(str(cache_filepath))
         self.cache = Cache(filepath=self.cache_filepath)
         self.set_downloader()
@@ -52,10 +67,14 @@ class JiosaavnDownload:
         _title = f'[Jiosaavn]{song.sanitized_name}'
         _msg = f'Album: {song.sanitized_album}\n\n ![]({song.image_url})'
         notify(app=self.GOTIFY_CHANNEL,title=_title, message=_msg, 
-                priority=2,url=self.GOTIFY_URL)
+                priority=2,url=self.GOTIFY_URL, apptoken=self.__gotify_key)
     
-    def playlist(self, id: str|int, skip_downloaded: bool = True, debug_only: bool=False):
-        for song in self.ApiProvider.playlist(id=id):
+    def playlist(self, id_link: str|int, skip_downloaded: bool = True, debug_only: bool=False):
+        if id_link.startswith('http') or id_link.startswith('www'):
+            songs = self.ApiProvider.playlist(link=id_link)
+        else:
+            songs = self.ApiProvider.playlist(id=id_link)
+        for song in songs:
             self._download_song(song=song, skip_downloaded=skip_downloaded, debug_only=debug_only)
         
     def check_downloaded(self, song: Song) -> bool:
@@ -66,3 +85,12 @@ def _download_song(song: Song, final_location: Path|str) -> None:
     song.download()
     song.embed_metadata()
     song.move(finalpath=final_location)
+    
+def get_config() -> dict:
+    config_path: Path = Path(__file__).parent.parent.parent / 'config.json'
+    if config_path.exists():
+        with open(config_path, 'r') as f:
+            config = tomllib.loads(f.read())
+    else: 
+        config = {}
+    return config
