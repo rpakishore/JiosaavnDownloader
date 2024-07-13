@@ -70,6 +70,8 @@ Alternatively, download the release and install with pip
 
 Can be used as python package or through cli.
 
+Copy `config.example.toml` to `config.toml` and edit accordingly
+
 For cli, try
 
 ```bash
@@ -87,7 +89,7 @@ from jiosaavn.API import SaavnMe
 saavn = JiosaavnDownload(cache_filepath='database.pkl', final_location='Y:\\Music')
 #Choose downloader
 saavn.set_downloader(downloader=SaavnMe())
-#Set Gotify Notifications; Can skip if not needed; Will prompt for API Key on first run.
+#Can set Gotify Notifications; Can skip if not needed; Will prompt for API Key on first run.
 saavn.GOTIFY_CHANNEL = "Media"
 #Download song, skip if previously downloaded
 saavn.song(url='https://www.jiosaavn.com/song/houdini/OgwhbhtDRwM', skip_downloaded=True)
