@@ -73,7 +73,7 @@ Can be used as python package or through cli.
 For cli, try
 
 ```bash
-  jiosaavn --help
+  app --help
 ```
 
 For python package
