@@ -34,7 +34,7 @@ class SaavnMe:
 
     def search_song(self, query: str) -> list[Song]:
         """Returns a list of Song dataclass from the search query"""
-        req_url: str = f"{self.url(type='search_song')}?query={query}&limit=100"
+        req_url: str = f"{self.url(type='search_song')}?query={query}&limit=1000"
         _res = self.SESSION.get(req_url)
         data: dict = json.loads(_res.content.decode())["data"]
         return _parse_playlist_results(data["results"])
