@@ -10,7 +10,7 @@ from jiosaavn.utils import log
 
 
 class SaavnMe:
-    BASEURL: str = "https://saavn.dev/"
+    BASEURL: str = "https://saavn.sumit.co/"
     SESSION = RequestsSession()
     log.info("SaavnMe Instance Initialized")
 

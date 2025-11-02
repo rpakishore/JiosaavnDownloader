@@ -130,4 +130,4 @@ Project Link: [https://github.com/rpakishore/JiosaavnDownloader](https://github.
 <!-- Acknowledgments -->
 ## 7. Acknowledgements
 
-- [saavn.dev](https://github.com/sumitkolhe/jiosaavn-api)
+- [saavn.sumit.co](https://github.com/sumitkolhe/jiosaavn-api)
