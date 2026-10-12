@@ -1,0 +1,4 @@
+# Append-only song log: keep both sides' new lines on merge, LF everywhere.
+songs.jsonl merge=union text eol=lf
+# Shell scripts must keep LF line endings to run on Linux, even from a Windows checkout.
+*.sh text eol=lf

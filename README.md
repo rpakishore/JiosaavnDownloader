@@ -86,7 +86,7 @@ from jiosaavn import JiosaavnDownload
 from jiosaavn.API import SaavnMe
 
 #Choose the database filepath & Final music location
-saavn = JiosaavnDownload(cache_filepath='database.pkl', final_location='Y:\\Music')
+saavn = JiosaavnDownload(cache_filepath='songs.jsonl', final_location='Y:\\Music')
 #Choose downloader
 saavn.set_downloader(downloader=SaavnMe())
 #Can set Gotify Notifications; Can skip if not needed; Will prompt for API Key on first run.
@@ -108,6 +108,24 @@ playlists = [
 ]
 for playlist in playlists:
     saavn.playlist(id=playlist)
+```
+
+### Download database
+
+Downloaded songs are recorded in `songs.jsonl` (one JSON object per line, append-only), which is committed to this repo. `.gitattributes` sets `merge=union` on it, so concurrent appends from different machines merge without conflicts; duplicate ids are ignored on load.
+
+### Weekly schedule (Linux)
+
+`scripts/weekly.sh` pulls the repo, runs `app sync` (downloads every playlist under `[schedule] playlists` in `config.toml`), then commits and pushes `songs.jsonl` only. It holds a `flock` so runs never overlap, refuses to run if other tracked files have local changes, commits whatever was downloaded even if a playlist fails, and sends a Gotify alert on any failure when `GOTIFY_URL` and `GOTIFY_TOKEN` are set.
+
+One-time setup on the Linux machine:
+
+1. Create an SSH key and add it to this repo as a deploy key with **write access** (Settings → Deploy keys), then clone over SSH.
+2. Copy `config.example.toml` to `config.toml` and set `destination` and `[schedule] playlists`.
+3. Add a crontab entry (`crontab -e`), using absolute paths since cron's `PATH` is minimal:
+
+```cron
+0 3 * * 0  UV=/home/USER/.local/bin/uv GOTIFY_URL=https://gotify.example.com GOTIFY_TOKEN=xxxx /path/to/JiosaavnDownloader/scripts/weekly.sh >> /path/to/weekly.log 2>&1
 ```
 
 <!-- Roadmap -->

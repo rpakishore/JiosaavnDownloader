@@ -1,11 +1,12 @@
 import typer
 from pathlib import Path
 from jiosaavn import JiosaavnDownload
+from jiosaavn.main import get_config
 
 import tomllib
 
 #Default import to globally enable/disable debugger
-from . import ic
+from . import ic, log
 ic.configureOutput(prefix=f'{Path(__file__).name} -> ')
 
 
@@ -30,6 +31,28 @@ def song(
     final_path = get_final_path(final_path)
     saavn = JiosaavnDownload(final_location=final_path)
     saavn.song(url, skip_downloaded=True)
+
+@app.command()
+def sync(final_path: str = ''):
+    """Downloads every playlist listed under `[schedule] playlists` in config.toml
+    """
+    playlists = get_config().get('schedule', {}).get('playlists', [])
+    if not playlists:
+        raise Exception('No playlists configured under `[schedule] playlists` in config.toml')
+
+    final_path = get_final_path(final_path)
+    saavn = JiosaavnDownload(final_location=final_path)
+    failed = []
+    for playlist_id in playlists:
+        try:
+            saavn.playlist(str(playlist_id), skip_downloaded=True)
+        except Exception as e:
+            log.error(f'Playlist {playlist_id} failed: {e!r}')
+            failed.append(str(playlist_id))
+
+    if failed:
+        log.error(f'{len(failed)}/{len(playlists)} playlist(s) failed: {", ".join(failed)}')
+        raise typer.Exit(code=1)
 
 def get_final_path(final_path: str = '') -> Path:
     config_path: Path = Path(__file__).parent.parent.parent / 'config.toml'

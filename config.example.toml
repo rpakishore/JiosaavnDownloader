@@ -1,8 +1,11 @@
 [paths]
-db_folder='''.'''   # This is folder where database.pkl file is stored
+db_folder='''.'''   # This is folder where songs.jsonl file is stored
 destination='''.''' # This is folder where music will be stored
 
 [gotify]
 url='https://gotify.example.com'  # Gotify server url
 app_name=''
 app_key=''  # Alternatively set this to "" and save the app_key to keyring under ('gotify', 'app_key')
+
+[schedule]
+playlists=[]  # Playlist ids downloaded by `app sync` (used by scripts/weekly.sh), e.g. ['109815423', '799619460']

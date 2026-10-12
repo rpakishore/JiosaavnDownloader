@@ -22,7 +22,7 @@ class JiosaavnDownload:
         config = get_config()
         if cache_filepath is None:
             cache_filepath = (
-                Path(config.get("paths", {}).get("db_folder", ".")) / "database.pkl"
+                Path(config.get("paths", {}).get("db_folder", ".")) / "songs.jsonl"
             )
         if final_location is None:
             final_location = Path(config.get("paths", {}).get("destination", "."))
@@ -65,9 +65,7 @@ class JiosaavnDownload:
         if self.GOTIFY_CHANNEL:
             self.__gotify(song)
         if not debug_only:
-            _cache_data = self.cache.data
-            _cache_data.append(song)
-            self.cache.write(data=_cache_data)
+            self.cache.add(song)
         else:
             log.debug("Cache will be updated here.")
 
@@ -109,7 +107,7 @@ class JiosaavnDownload:
 
     def check_downloaded(self, song: Song) -> bool:
         """Checks if the specified song has previously been downloaded"""
-        return song.id in [each.id for each in self.cache.data]
+        return self.cache.is_downloaded(song.id)
 
 
 def _download_song(song: Song, final_location: Path | str) -> None:

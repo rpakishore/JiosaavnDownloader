@@ -28,3 +28,5 @@ def test_defaults(config):
     assert config['gotify'].get('url') == 'https://gotify.example.com'
     assert config['gotify'].get('app_name') == ''
     assert config['gotify'].get('app_key') == ''
+
+    assert config['schedule'].get('playlists') == []
