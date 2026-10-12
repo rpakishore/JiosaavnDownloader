@@ -1,151 +1,99 @@
-<!--- Heading --->
 <div align="center">
   <h1>Jiosaavn Downloader</h1>
-  <p>
-    Download Jiosaavn mp3 from unofficial API
-  </p>
-<h4>
+  <p>Download Jiosaavn songs and playlists as tagged mp3 files, using an unofficial API.</p>
+  <h4>
     <a href="https://github.com/rpakishore/JiosaavnDownloader/issues/">Report Bug</a>
-  <span> · </span>
+    <span> | </span>
     <a href="https://github.com/rpakishore/JiosaavnDownloader/issues/">Request Feature</a>
   </h4>
 </div>
-<br />
 
-![GitHub commit activity](https://img.shields.io/github/commit-activity/m/rpakishore/JiosaavnDownloader)
-![GitHub last commit](https://img.shields.io/github/last-commit/rpakishore/JiosaavnDownloader)
-<!-- Table of Contents -->
-<h2>Table of Contents</h2>
+## Features
 
-- [1. About the Project](#1-about-the-project)
-  - [1.1. Features](#11-features)
-- [2. Getting Started](#2-getting-started)
-  - [2.1. Prerequisites](#21-prerequisites)
-  - [2.2. Installation](#22-installation)
-- [3. Usage](#3-usage)
-- [4. Roadmap](#4-roadmap)
-- [5. License](#5-license)
-- [6. Contact](#6-contact)
-- [7. Acknowledgements](#7-acknowledgements)
+- Downloads songs, playlists and search results as 320k mp3 with ID3 tags and cover art.
+- Remembers what it downloaded (`songs.jsonl`), so nothing is downloaded twice.
+- One failing song never stops a run: it is logged, skipped and retried next time.
+- Optional Gotify notification per downloaded song.
 
-<!-- About the Project -->
-## 1. About the Project
+## Install
 
-<!-- Features -->
-### 1.1. Features
-
-- Currently uses free saavn.me api endpoints, additional endpoints can easily be added.
-- Holds memory of previously downloaded files to prevent re-downloads.
-- Can handle individual songs and playlists
-- Can send download notifications through gotify
-
-<!-- Getting Started -->
-## 2. Getting Started
-
-<!-- Prerequisites -->
-### 2.1. Prerequisites
-
-python 3.11+
-
-<!-- Installation -->
-### 2.2. Installation
-
-Clone repo and install with flit
+Requires Python 3.12+, [uv](https://docs.astral.sh/uv/) and `ffmpeg` on the `PATH`.
 
 ```bash
-  git clone https://github.com/rpakishore/JiosaavnDownloader.git
-  cd JiosaavnDownloader
-  pip install flit
-  flit install --deps production
+git clone https://github.com/rpakishore/JiosaavnDownloader.git
+cd JiosaavnDownloader
+uv sync
 ```
 
-Alternatively, download the release and install with pip
+## Configure
+
+Copy `config.example.toml` to `config.toml` and edit it:
+
+| Key | Meaning |
+| --- | --- |
+| `paths.destination` | Folder the mp3 files are written to |
+| `paths.db_folder` | Folder holding `songs.jsonl` |
+| `gotify.url`, `gotify.app_key` | Gotify server and app token (optional; falls back to env `GOTIFY_URL` / `GOTIFY_TOKEN`) |
+| `schedule.playlists` | Playlist ids downloaded by `app sync` |
+
+Relative paths are resolved against the config file's folder.
+
+## Usage
 
 ```bash
-  pip install jiosaavn-0.0.1-py2.py3-none-any.whl
+uv run app sync                                  # every playlist in config.toml
+uv run app playlist 109815423                    # a playlist id or link
+uv run app song https://www.jiosaavn.com/song/houdini/OgwhbhtDRwM
+uv run app search "houdini" --limit 5            # top 5 results
+
+uv run app --dest ~/Music --dry-run -v playlist 109815423
 ```
 
-<!-- Usage -->
-## 3. Usage
+Global options go before the command:
 
-Can be used as python package or through cli.
+| Option | Meaning |
+| --- | --- |
+| `--config PATH` | Config file (default `config.toml`) |
+| `--dest DIR` | Destination folder, overrides `paths.destination` |
+| `--dry-run` | Show what would be downloaded; downloads and caches nothing |
+| `-v`, `--verbose` | Debug logging |
 
-Copy `config.example.toml` to `config.toml` and edit accordingly
+Logs go to stderr. Exit code is 0 on success, 1 if any song or playlist failed, 2 on bad usage or setup (no destination, no playlists, ffmpeg missing).
 
-For cli, try
-
-```bash
-  app --help
-```
-
-For python package
-
-```python
-#Initialize
-from jiosaavn import JiosaavnDownload
-from jiosaavn.API import SaavnMe
-
-#Choose the database filepath & Final music location
-saavn = JiosaavnDownload(cache_filepath='songs.jsonl', final_location='Y:\\Music')
-#Choose downloader
-saavn.set_downloader(downloader=SaavnMe())
-#Can set Gotify Notifications; Can skip if not needed; Will prompt for API Key on first run.
-saavn.GOTIFY_CHANNEL = "Media"
-#Download song, skip if previously downloaded
-saavn.song(url='https://www.jiosaavn.com/song/houdini/OgwhbhtDRwM', skip_downloaded=True)
-#Download all songs in playlists
-playlists = [
-    '109815423',        #Top Kuthu - Tamil
-    '799619460',        #Tamil EDM,
-    '1134651042',       #Tamil: India Superhits Top 50
-    '80802063',         #Tamil Viral Hits
-    '109118539',        #Motivational Hits - Tamil
-    '83412571',         #Workout Beats - Tamil
-    '837803163',        #Chill Hits - Tamil,
-    '696005328',        #House Party - Tamil
-    '67691546',         #Semma Mass - Tamil
-    '1134705865',       #Malayalam: India Superhits Top 50
-]
-for playlist in playlists:
-    saavn.playlist(id=playlist)
-```
-
-### Download database
+## Download database
 
 Downloaded songs are recorded in `songs.jsonl` (one JSON object per line, append-only), which is committed to this repo. `.gitattributes` sets `merge=union` on it, so concurrent appends from different machines merge without conflicts; duplicate ids are ignored on load.
 
-### Weekly schedule (Linux)
+## Weekly schedule (Linux)
 
 `scripts/weekly.sh` pulls the repo, runs `app sync` (downloads every playlist under `[schedule] playlists` in `config.toml`), then commits and pushes `songs.jsonl` only. It holds a `flock` so runs never overlap, refuses to run if other tracked files have local changes, commits whatever was downloaded even if a playlist fails, and sends a Gotify alert on any failure when `GOTIFY_URL` and `GOTIFY_TOKEN` are set.
 
 One-time setup on the Linux machine:
 
-1. Create an SSH key and add it to this repo as a deploy key with **write access** (Settings → Deploy keys), then clone over SSH.
+1. Create an SSH key and add it to this repo as a deploy key with **write access** (Settings, Deploy keys), then clone over SSH.
 2. Copy `config.example.toml` to `config.toml` and set `destination` and `[schedule] playlists`.
-3. Add a crontab entry (`crontab -e`), using absolute paths since cron's `PATH` is minimal:
+3. Add a crontab entry (`crontab -e`), using absolute paths since cron's `PATH` is minimal. The log output goes to stderr, which the redirect captures:
 
 ```cron
 0 3 * * 0  UV=/home/USER/.local/bin/uv GOTIFY_URL=https://gotify.example.com GOTIFY_TOKEN=xxxx /path/to/JiosaavnDownloader/scripts/weekly.sh >> /path/to/weekly.log 2>&1
 ```
 
-<!-- Roadmap -->
-## 4. Roadmap
+## Development
 
-- [ ] Additional endpoints
+```bash
+uv sync --extra test
+uv run pytest -q                 # offline tests
+uv run pytest -m live            # also hits the real API
+```
 
-<!-- License -->
-## 5. License
+## License
 
-See LICENSE.txt for more information.
+See LICENSE.
 
-<!-- Contact -->
-## 6. Contact
+## Contact
 
 Arun Kishore - [@rpakishore](mailto:pypi@rpakishore.co.in)
 
-Project Link: [https://github.com/rpakishore/JiosaavnDownloader](https://github.com/rpakishore/JiosaavnDownloader)
-
-<!-- Acknowledgments -->
-## 7. Acknowledgements
+## Acknowledgements
 
 - [saavn.sumit.co](https://github.com/sumitkolhe/jiosaavn-api)
