@@ -33,6 +33,7 @@ def test_build_command_with_image():
     assert "attached_pic" in cmd
     assert cmd[cmd.index("-b:a") + 1] == "320k"
     assert cmd[cmd.index("-id3v2_version") + 1] == "3"
+    assert cmd[cmd.index("-map_metadata") + 1] == "-1"
     assert meta_pairs(cmd) == ["title=Ünï", "artist=A, B", "album=Alb", "album_artist=A, B, C", "date=2020"]
 
 
@@ -95,6 +96,7 @@ def test_download_with_cover(media, tmp_path):
     assert tags["album"] == "Alb"
     assert tags["album_artist"] == "A, B, C"
     assert tags["date"] == "2020"
+    assert "major_brand" not in tags  # source container tags are not copied over
     audio_stream, video_stream = info["streams"]
     assert audio_stream["codec_name"] == "mp3"
     assert int(audio_stream["bit_rate"]) == pytest.approx(320_000, rel=0.05)

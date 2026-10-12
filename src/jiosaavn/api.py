@@ -49,11 +49,16 @@ def _parse_songs(items: list[dict]) -> list[Song]:
             songs.append(parse_song(item))
         except _MALFORMED as e:
             log.warning("Skipping malformed song %r: %r", item.get("id") if isinstance(item, dict) else item, e)
+    if items and not songs:
+        raise RuntimeError(f"all {len(items)} songs in the response are malformed; has the API changed?")
     return songs
 
 
 def _default_session() -> requests.Session:
-    retry = Retry(total=3, backoff_factor=1, status_forcelist=(429, 500, 502, 503, 504))
+    # Ignore Retry-After: a long one would stall the cron job; the backoff is enough.
+    retry = Retry(
+        total=3, backoff_factor=1, status_forcelist=(429, 500, 502, 503, 504), respect_retry_after_header=False
+    )
     session = requests.Session()
     session.mount("https://", HTTPAdapter(max_retries=retry))
     return session

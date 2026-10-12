@@ -82,8 +82,19 @@ def test_sanitize_truncation_strips_trailing_dots():
         ("Say &quot;Hi&quot;", ('Say "Hi"', None)),
         ('  Leo (From "Leo")  ', ("Leo", "Leo")),
         ("Tom &amp; Jerry", ("Tom & Jerry", None)),
-        ('Trailing (From "Leo") x', ('Trailing (From "Leo") x', None)),
+        ('Killer (From "Leo") (Hindi)', ("Killer (Hindi)", "Leo")),
+        ('Not Ramaiya [From "Jawan"]', ('Not Ramaiya [From "Jawan"]', None)),
     ],
 )
 def test_clean_title(raw, expected):
     assert clean_title(raw) == expected
+
+
+def test_filename_strips_from_part_in_the_middle():
+    # Same as the pre-refactor filenames: '(From "X")' is dropped wherever it sits
+    song = make_song(
+        name=clean_title('Killer Killer (From &quot;Captain Miller&quot;) (Hindi)')[0],
+        album=clean_title('La La (From "MM Originals") (Original Soundtrack)')[1] or "",
+        year=2024,
+    )
+    assert song.filename == "Killer Killer (Hindi)-MM Originals(2024).mp3"

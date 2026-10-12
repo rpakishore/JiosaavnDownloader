@@ -11,7 +11,7 @@ _RESERVED = {
     *(f"COM{i}" for i in range(1, 10)),
     *(f"LPT{i}" for i in range(1, 10)),
 }  # fmt: skip
-_FROM_RE = re.compile(r'^(.*) \(From "(.*)"\)$')
+_FROM = re.compile(r' ?\(From "(.*)"\)')
 _MAX_LEN = 255
 
 
@@ -54,8 +54,11 @@ def sanitize(filename: str) -> str:
 
 
 def clean_title(name: str) -> tuple[str, str | None]:
-    """Unescape `name`; split 'Title (From "Movie")' into ('Title', 'Movie')."""
+    """Unescape `name` and drop its '(From "Movie")' part, wherever it sits.
+
+    Returns (title, movie): 'Title (From "Movie")' -> ('Title', 'Movie'),
+    'Title (From "Movie") [Hindi]' -> ('Title [Hindi]', 'Movie'), no match -> (name, None).
+    """
     name = html.unescape(name).strip()
-    if match := _FROM_RE.match(name):
-        return match.group(1), match.group(2)
-    return name, None
+    match = _FROM.search(name)
+    return _FROM.sub("", name), match and match.group(1)

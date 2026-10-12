@@ -4,7 +4,7 @@ from unittest.mock import MagicMock, patch
 import pytest
 import requests
 
-from jiosaavn.api import SaavnClient, parse_song
+from jiosaavn.api import SaavnClient, _parse_songs, parse_song
 from jiosaavn.song import Song
 
 SONG_DICT = {
@@ -185,6 +185,7 @@ def test_default_session_retries_on_server_errors():
     adapter = SaavnClient().session.get_adapter("https://saavn.sumit.co")
     assert adapter.max_retries.total == 3
     assert 429 in adapter.max_retries.status_forcelist
+    assert not adapter.max_retries.respect_retry_after_header  # a huge Retry-After must not stall the cron job
 
 
 def test_throttle_sleeps_to_keep_min_interval():
@@ -215,3 +216,8 @@ def test_live_playlist():
     songs = SaavnClient().playlist("109815423")
     assert len(songs) > 10
     assert len({s.id for s in songs}) == len(songs)
+
+
+def test_all_malformed_raises():
+    with pytest.raises(RuntimeError, match="malformed"):
+        _parse_songs([{"id": "x"}, {"id": "y"}])

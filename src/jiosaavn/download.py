@@ -27,6 +27,7 @@ def build_command(song: Song, out_path: Path, bitrate: str) -> list[str]:
         ]  # fmt: skip
     cmd += [
         "-c:a", "libmp3lame", "-b:a", bitrate, "-id3v2_version", "3",
+        "-map_metadata", "-1",  # don't copy the source container's tags (major_brand, encoder, ...)
         "-metadata", f"title={song.name}",
         "-metadata", f"artist={', '.join(song.primary_artists)}",
         "-metadata", f"album={song.album}",
